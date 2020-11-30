@@ -156,10 +156,10 @@ export default class ChatRoom extends Component {
 			}
 			root.querySelector(`.${styles.profile}`).style.display = 'none';
 		});
-		// comp.fetchMedia('profile', {
-		// 	object: profilePic.querySelector('img'),
-		// 	id: 0
-		// });
+		comp.fetchMedia('profile', {
+			object: profilePic.querySelector('img'),
+			id: 0
+		});
 		const profileName = root.querySelector(`.${styles.profile_name}`);
 		profileName.querySelector('h1').addEventListener('click', function (evn) {
 			profileName.querySelector('input').style.display = 'block';
