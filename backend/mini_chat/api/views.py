@@ -121,17 +121,16 @@ def get_token(request):
 @api_view(['GET', 'POST'])
 def dashboard(request):
     """
-    Dashboard view
+    Return the dashboard view, to control the rooms and messages
     """
     try:
         token = request.headers['Authorization'].split(' ')[1]
         tok = Token.objects.get(key=token)
     except Exception as e:
-        # return Response(data={
-        #     'error': 'No authorized'
-        # }, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(data={
+            'error': 'No authorized'
+        }, status=status.HTTP_401_UNAUTHORIZED)
         pass
-    # # logger.error(tok.user_id)
     rooms = Room.objects.all()
     rooms_obj = []
     for room in rooms:
@@ -147,13 +146,16 @@ def dashboard(request):
             'rooms': rooms_obj,
             'user': 'admin',
             'api_url': os.environ['API_URL']
-        }) # User.objects.get(id=tok.user_id).username})
+        })
 
 
 @api_view(['GET', 'POST', 'PUT'])
 def rooms(request):
     """
     CRUD for rooms
+    POST: creates a 'new room' instance
+    GET: Return a list of all rooms
+    PUT: Update the Room name, just for admin
     """
     try:
         token = request.headers['Authorization'].split(' ')[1]
@@ -193,7 +195,7 @@ def rooms(request):
 @api_view(['DELETE'])
 def rooms_delete(request, *args, **kwargs):
     """
-    CRUD for rooms
+    Deletes a room
     """
     # logger.error('entra aqui')
     try:
@@ -211,10 +213,10 @@ def rooms_delete(request, *args, **kwargs):
         'success': True
     })
 
-@api_view(['GET', 'POST'])
+@api_view(['GET'])
 def rooms_users(request, *args, **kwargs):
     """
-    Rooms users
+    Get all Users registered to the chat
     """
     try:
         token = request.headers['Authorization'].split(' ')[1]
@@ -224,8 +226,6 @@ def rooms_users(request, *args, **kwargs):
                 'error': 'Error retrieving token'
         }, status=status.HTTP_401_UNAUTHORIZED)
     user_instance = User.objects.get(id=tok.user_id)
-    # room = Room.objects.get(id=kwargs['id'])
-    # room.users.add(user_instance)
     users = User.objects.all().order_by('-last_login')
     uss = []
     for user in users.values():
@@ -243,7 +243,7 @@ def rooms_users(request, *args, **kwargs):
 @api_view(['GET'])
 def messages_get(request, *args, **kwargs):
     """
-    Return messages or store them by Room id
+    Return messages filtered by room
     """
     try:
         # logger.error(request.headers['Authorization'])
@@ -258,13 +258,9 @@ def messages_get(request, *args, **kwargs):
             room = Room.objects.get(id=kwargs['roomId'])
             messages = Message.objects.all().filter(room=room.id).order_by('created_at')
             mess = []
-            # logger.error(str(messages.values()))
             for m in messages.values():
-                # # logger.error(str(m['created_at']))
                 created = m['created_at']
-                # logger.error(f'{created.tzinfo}')
                 mess.append({
-                    # 'created_at': f'{created.hour:0>2}:{created.minute:0>2}',
                     'created_at': created.astimezone().isoformat(),
                     'content': m['content'],
                     'user': User.objects.get(id=m['user_id']).username,
@@ -272,8 +268,6 @@ def messages_get(request, *args, **kwargs):
                     'id': m['id'],
                     'media': m['media']
                 })
-            # user_instance = User.objects.get(id=tok.user_id)
-            # logger.error(tok.user)
             return Response(
                 data={
                     'messages': mess,
@@ -291,9 +285,9 @@ def messages_get(request, *args, **kwargs):
 def messages_post(request, *args, **kwargs):
     """
     Return messages or store them by Room id
+    POST: receives 'content' string
     """
     try:
-        # logger.error(request.headers['Authorization'])
         token = request.headers['Authorization'].split(' ')[1]
         tok = Token.objects.get(key=token)
     except Exception as e:
@@ -308,8 +302,6 @@ def messages_post(request, *args, **kwargs):
     message.room = room
     tim = datetime.now()
     final_tim = timezone.make_aware(tim, timezone=pytz.timezone('UTC'))
-    # # logger.error(str(tim))
-    # # logger.error(str(final_tim))
     message.created_at = final_tim
     message.save()
     return Response(data={
@@ -319,7 +311,7 @@ def messages_post(request, *args, **kwargs):
 @api_view(['DELETE'])
 def messages_del(request, *args, **kwargs):
     """
-    Deletes a message
+    Deletes a message, and remove if attached any media file from localdevice
     """
     try:
         token = request.headers['Authorization'].split(' ')[1]
