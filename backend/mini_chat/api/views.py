@@ -425,7 +425,7 @@ def media_get(request, *args, **kwargs):
     try:
         img = open(f'{os.getcwd()}/mini_chat/static/media/{filename}', 'rb')
     except Exception as e:
-        logger.erro(f'file not found: {os.getcwd()}/mini_chat/static/media/{filename}')
+        logger.error(f'file not found: {os.getcwd()}/mini_chat/static/media/{filename}')
         logger.error(str(e))
         return Response(data={
             'success': False
