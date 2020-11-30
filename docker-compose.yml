@@ -10,8 +10,8 @@ services:
     depends_on:
       - db
     environment:
-#       - API_URL=http://localhost:8000/api
-       - API_URL=http://13.59.57.0/api
+       - API_URL=http://localhost:8000/api
+#        - API_URL=http://13.59.57.0/api
   db:
     image: postgres:12-alpine
     volumes:
@@ -21,6 +21,16 @@ services:
       - POSTGRES_PASSWORD=mini_chat_passwd
       - POSTGRES_DB=mini_chat_dev_db
       - TZ=America/Bogota
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    command: npm start --prefix /usr/src/app/frontend/mini_chat
+    ports:
+      - 3000:3000
+    stdin_open: true
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
