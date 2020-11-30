@@ -117,7 +117,7 @@ export default class ChatRoom extends Component {
 			root.querySelector(`.${styles.uploader }`).style.display = 'none';
 		});
 		root.querySelector(`.${styles.uploader} button`).addEventListener('click', async function (evn) {
-			console.log('uploade image');
+			console.log('upload image');
 			await comp.uploadImage('message');
 			// console.log(roomId);
 			comp.loadMessages();
@@ -246,7 +246,7 @@ export default class ChatRoom extends Component {
 		root.querySelector(`.${styles.room_name} h1`).innerHTML = name;
 		root.querySelector(`.${styles.rooms}`).style.display = 'none';
 		console.log(id);
-		await this.getUsers(id);
+		await this.getUsers(id);	
 		root.querySelector(`.${styles.chat}`).style.display = 'block';
 		await this.loadMessages();
 	}
@@ -271,7 +271,6 @@ export default class ChatRoom extends Component {
 		}
 		
 	}
-
 	async getUsers (id) {
 		console.log(id);
 		const req = await fetch(
@@ -382,7 +381,7 @@ export default class ChatRoom extends Component {
 			if (message.media) {
 				const img = li.querySelector('img');
 				const obj = {id: message.id, object: img};
-				await comp.fetchMedia('message', Object.assign({}, obj));
+				comp.fetchMedia('message', Object.assign({}, obj));
 			}
 		}
 		setTimeout(function () {
