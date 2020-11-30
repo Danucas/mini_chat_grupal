@@ -10,8 +10,8 @@ services:
     depends_on:
       - db
     environment:
-      - API_URL=http://localhost:8000/api
-#       - API_URL=http://13.59.57.0/api
+#      - API_URL=http://localhost:8000/api
+      - API_URL=http://13.59.57.0/api
     volumes:
       - static:/usr/src/app/mini_chat/static
   db:
