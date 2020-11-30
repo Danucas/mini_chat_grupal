@@ -305,6 +305,7 @@ export default class ChatRoom extends Component {
 		}
 	}
 	async fetchMedia (type, obj) {
+		const root = this.rootRef.current;
 		const req = await fetch(
 			`${process.env.REACT_APP_API_URL}/media/${obj.id}?type=${type}`,
 			{
@@ -316,6 +317,10 @@ export default class ChatRoom extends Component {
 		);
 		const res = await req.blob();
 		obj.object.src = window.URL.createObjectURL(res);
+		if (type === 'message') {
+			const ul = root.querySelector(`.${styles.messages}`);
+			ul.scrollTop = ul.scrollHeight;
+		}
 		// console.log(res);
 	}
 	async renderMessages (messages, id) {
