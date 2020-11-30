@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		{% load static %}
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<!-- <link rel="icon" href="favicon.ico"> -->
+		<link rel="apple-touch-icon" sizes="57x57" href="{% static 'favicons/apple-icon-57x57.png' %}">
+		<link rel="apple-touch-icon" sizes="60x60" href="{% static 'favicons/apple-icon-60x60.png' %}">
+		<link rel="apple-touch-icon" sizes="72x72" href="{% static 'favicons/apple-icon-72x72.png' %}">
+		<link rel="apple-touch-icon" sizes="76x76" href="{% static 'favicons/apple-icon-76x76.png' %}">
+		<link rel="apple-touch-icon" sizes="114x114" href="{% static 'favicons/apple-icon-114x114.png' %}">
+		<link rel="apple-touch-icon" sizes="120x120" href="{% static 'favicons/apple-icon-120x120.png' %}">
+		<link rel="apple-touch-icon" sizes="144x144" href="{% static 'favicons/apple-icon-144x144.png' %}">
+		<link rel="apple-touch-icon" sizes="152x152" href="{% static 'favicons/apple-icon-152x152.png' %}">
+		<link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-icon-180x180.png' %}">
+		<link rel="icon" type="image/png" sizes="192x192"  href="{% static 'favicons/android-icon-192x192.png' %}">
+		<link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicons/favicon-32x32.png' %}">
+		<link rel="icon" type="image/png" sizes="96x96" href="{% static 'favicons/favicon-96x96.png' %}">
+		<link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicons/favicon-16x16.png' %}">
+		<link rel="manifest" href="/manifest.json">
+		<meta name="msapplication-TileColor" content="#ffffff">
+		<meta name="msapplication-TileImage" content="{% static 'favicons/ms-icon-144x144.png' %}">
+		<meta name="theme-color" content="#ffffff">
+		<link rel="preconnect" href="https://fonts.gstatic.com">
+		<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@200&display=swap" rel="stylesheet">
+		<title>Dashboard</title>
+		<style>
+			body {
+				background-color: rgb(211, 211, 211);
+				font-family: 'Titillium Web', sans-serif;
+			}
+			#side_bar {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 100vh;
+				width: 240px;
+				background-color: rgb(4, 133, 120);
+				overflow-y: scroll;
+			}
+			#side_bar::-webkit-scrollbar {
+				width: 10px;
+				background-color: rgb(2, 175, 158);
+			}
+			#side_bar::-webkit-scrollbar-thumb {
+				background-color: white;
+				border-radius: 8px;
+			}
+			#side_bar .profile_pic {
+				position: absolute;
+				top: 40px;
+				left: calc(50% - 70px);
+				width: 140px;
+				height: 140px;
+				background-color: rgba(255, 255, 255, 0.083);
+				border-radius: 50%;
+				cursor: pointer;
+				overflow: hidden;
+			}
+			.profile_pic:hover {
+				filter: brightness(0.8);
+			}
+			.profile_pic:active {
+				filter: brightness(1);
+			}
+			.profile_pic img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+			.change_photo {
+				display: none;
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(255, 255, 255, 0.46);
+				animation-duration: 0.5s;
+				animation-name: fade-in-photo;
+				animation-fill-mode: forwards;
+				background-image: url("{% static 'svg/pen.svg' %}");
+				background-repeat: no-repeat;
+				background-position: center;
+				background-size: 30%;
+				filter: invert();
+			}
+			.change_photo input {
+				display: none !important;
+			}
+			@keyframes fade-in-photo {
+				0% {opacity: 0;}
+				100% {opacity: 1;}
+			}
+			.profile_name {
+				width: 90%;
+				left: 5%;
+				position: absolute;
+				top: 200px;
+			}
+			.profile_name h1 {
+				font-size: 18px;
+				color: white;
+				text-align: center;
+			}
+			.profile_name input {
+				display: none;
+				width: calc(100% - 20px);
+				height: 100%;
+				position: absolute;
+				top: 0;
+				left: 0;
+				outline: none;
+				opacity: 1;
+				padding-left: 20px;
+				border-radius: 8px;
+				color: rgb(0, 182, 179);
+				font-size: 18px;
+				border: 1px solid white;
+			}
+			.room_name {
+				display: none;
+				cursor: text;
+				width: calc(90% - 4px);
+				left: 5%;
+				position: absolute;
+				top: 290px;
+				border-radius: 8px;
+				border: 2px solid white;
+				background-color: rgba(255, 255, 255, 0.748);
+			}
+			.room_name:hover {
+				border: 2px solid black;
+				background-color: white;
+			}
+			.change_room {
+				display: none;
+				cursor: pointer;
+				width: 90%;
+				left: 5%;
+				position: absolute;
+				top: 380px;
+				border-radius: 8px;
+				background-color: rgba(0, 0, 0, 0.179);
+			}
+			.delete_room {
+				display: none;
+				cursor: pointer;
+				width: 90%;
+				left: 5%;
+				position: absolute;
+				top: 440px;
+				border-radius: 8px;
+				background-color: rgba(238, 131, 131, 0.672);
+			}
+			.change_room:hover, .delete_room:hover{
+				transform: translate(-1px, -1px);
+				box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.207);
+			}
+			.change_room:active, .delete_room:active{
+				transform: translate(0px, 0px);
+				box-shadow: none;
+			}
+			.change_room h1, .delete_room h1 {
+				font-size: 18px;
+				color: white;
+				text-align: center;
+			}
+			.room_name h1 {
+				font-size: 18px;
+				color: rgb(0, 0, 0);
+				text-align: center;
+			}
+			.room_name input {
+				display: none;
+				border: 1px solid grey;
+				border-radius: 4px;
+				top: 0;
+				left: 0;
+				position: absolute;
+				width: calc(100% - 50px);
+				font-size: 18px;
+				padding: 14px 24px;
+			}
+			.logout {
+				position: absolute;
+				top: 500px;
+				left: 0;
+				width: 100%;
+				text-align: center;
+				padding-top: 12px;
+				padding-bottom: 12px;
+				cursor: pointer;
+				color: white;
+				font-size: 24px;
+				margin: 0;
+				line-height: 40px;
+			}
+			
+			.logout:hover {
+				background-color: rgba(255, 255, 255, 0.131);
+			}
+			.logout:active {
+				background-color: rgba(255, 255, 255, 0.432);
+			}
+			.account {
+				position: absolute;
+				top: 580px;
+				left: 0;
+				width: 100%;
+				text-align: center;
+				padding-top: 12px;
+				padding-bottom: 12px;
+				cursor: pointer;
+				color: white;
+				font-size: 24px;
+				margin: 0;
+				line-height: 40px;
+			}
+			
+			.account:hover {
+				background-color: rgba(255, 255, 255, 0.131);
+			}
+			.account:active {
+				background-color: rgba(255, 255, 255, 0.432);
+			}
+			#users {
+				display: none;
+				position: absolute;
+				border-radius: 8px;
+				background-color: white;
+				width: calc(100vw - 940px);
+				top: 12px;
+				left: 920px;
+				height: calc(100vh - 24px);
+				overflow: hidden;
+				animation-name: chat-fade-in;
+				animation-duration: 1s;
+				animation-fill-mode: forwards;
+				box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.357);
+			}
+			#users h1 {
+				width: 100%;
+				text-align: center;
+				font-size: 18px;
+				height: 40px;
+				margin: 0;
+				line-height: 40px;
+			}
+			#users ul {
+				width: 100%;
+				overflow-y: scroll;
+				margin: 0;
+				padding: 0;
+				height: calc(100% - 40px);
+				border-top: 1px solid rgb(208, 208, 208);
+			}
+			#users ul::-webkit-scrollbar {
+				width: 8px;
+				background-color: rgb(234, 253, 248);
+			}
+			#users ul::-webkit-scrollbar-thumb {
+				background-color: rgb(0, 159, 187);
+			}
+			#users li {
+				position: relative;
+				cursor: pointer;
+				border-radius: 2px;
+				margin: 0px;
+				list-style: none;
+				padding: 16px;
+				background-color: white;
+				color: rgb(60, 60, 60);
+				border-bottom: 1px solid rgb(208, 208, 208);
+			}
+			#users li > h1 {
+				width: calc(100% - 48px);
+				color: rgb(0, 123, 106);
+				font-size: 14px;
+				line-height: 18px;
+				padding-top: 0;
+				padding-bottom: 0;
+				margin-top: 0;
+				margin-left: 48px;
+				margin-bottom: 0;
+				height: auto;
+				text-align: left !important;
+			}
+			#users li > h2 {
+				margin-left: 48px;
+				width: calc(100% - 48px);
+				margin-top: 0;
+				color: rgb(124, 124, 124);
+				line-height: 14px;
+				font-size: 12px;
+			}
+			#users li > img {
+				position: absolute;
+				top: 12px;
+				left: 12px;
+				width: 40px;
+				height: 40px;
+				object-fit: cover;
+				border-radius: 50%;
+				box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.179);
+			}
+			#users h2 {
+				font-size: 16px;
+				line-height: 20px;
+				margin: 0;
+			}
+			#users h3 {
+				font-size: 16px;
+				line-height: 20px;
+				margin: 0;
+			}
+			#rooms {
+				padding: 20px;
+				position: absolute;
+				z-index: 4;
+				background-color: white;
+				border-radius: 8px;
+				top: 12px;
+				width: 300px;
+				left: calc(50vw - 170px);
+				animation-name: fade-in;
+				animation-duration: 1s;
+				animation-fill-mode: forwards;
+				box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.357);
+			}
+			#rooms ul {
+				max-height: 40vh;
+				padding: 0;
+			}
+			#rooms li {
+				border-radius: 8px;
+				cursor: pointer;
+				margin: 0;
+				margin-top: 1px;
+				list-style: none;
+				border: 1px solid rgba(128, 128, 128, 0.35);
+				text-align: center;
+				padding: 6px 24px;
+
+			}
+			#rooms li:hover {
+				background-color: rgb(238, 238, 238);
+				font-weight: bold;
+			}
+			#rooms li:active {
+				background-color: rgb(204, 237, 245);
+			}
+			#rooms button {
+				border-radius: 8px;
+				background-color: rgb(6, 206, 169);
+				width: 100%;
+				font-size: 19px;
+				color: white;
+				cursor: pointer;
+				border: none;
+				padding: 12px 24px;
+			}
+			button:hover {
+				cursor: pointer;
+				transform: translate(-1px, -1px);
+				box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.282);
+			}
+			button:active {
+				transform: translate(0px, 0px);
+				box-shadow: none;
+			}
+			@keyframes fade-in {
+				0% {top: 0;}
+				100% {top: 80px}
+			}
+			#chat {
+				display: none;
+				border-radius: 8px;
+				position: absolute;
+				width: calc(600px);
+				max-width: 600px;
+				height: calc(100vh - 65px);
+				background-color: white;
+				left: 260px;
+				top: 12px;
+				padding: 20px;
+				animation-name: chat-fade-in;
+				animation-duration: 1s;
+				animation-fill-mode: forwards;
+				box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.357);
+			}
+			@keyframes chat-fade-in {
+				0% {top: -5vw;}
+				100% {top: 12px;}
+			}
+			#messages {
+				position: relative;
+				border-radius: 8px;
+				width: 96%;
+				background-color: rgb(247, 247, 247);
+				height: calc(100% - 120px);
+				margin: 0;
+				margin-top: 20px;
+				padding: 12px;
+				overflow-y: scroll;
+				overflow-x: hidden;
+				scroll-behavior: smooth;
+				background-image: url("{% static 'svg/doodle.svg' %}");
+				background-position: center;
+				background-size: cover;
+				background-repeat: no-repeat;
+				/* transform: scaleY(-1); */
+			}
+			#messages::-webkit-scrollbar {
+				width: 10px;
+				background-color: rgb(243, 243, 243);
+				border-radius: 0px 8px 8px 0px;
+			}
+			#messages::-webkit-scrollbar-thumb {
+				background-color: rgba(0, 155, 101, 0.323);
+				border-radius: 8px;
+			}
+			#messages li {
+				list-style: none;
+				width: 100%;
+				height: auto;
+				/* transform: scaleY(-1); */
+			}
+			#messages [cont="message"] {
+				position: relative;
+				margin: 0;
+				margin-top: 8px;
+				background-color: white;
+				padding: 0px 52px 6px 12px;
+				max-width: calc(60%);
+				width: fit-content;
+				border-radius: 0px 8px 8px 8px;
+				box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.227);
+			}
+			.mine {
+				display: flex;
+				justify-content: flex-end;
+			}
+			.mine h3 {
+				margin-top: 0;
+				padding-top: 0;
+			}
+			.mine [cont="message"]{
+				border-radius: 8px 0px 8px 8px !important;
+				background-color: rgb(238, 255, 255) !important;
+			}
+			.first h1 {
+				width: 70%;
+				background-color: rgb(252, 236, 182);
+				font-size: 18px;
+				text-align: center;
+				padding: 8px 12px;
+				margin-left: 15%;
+				border-radius: 8px;
+				box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.282);
+			}
+			#messages p {
+				margin: 0;
+				line-height: 16px;
+				font-size: 16px;
+				font-family: sans-serif;
+				margin-bottom: 12px;
+			}
+			#messages h3 {
+				color: rgb(0, 175, 158);
+				font-weight: bold;
+				line-height: 14px;
+				font-size: 14px;
+				padding-top: 8px;
+				top: 8px;
+			}
+			#messages h4 {
+				padding: 0px 12px;
+				font-weight: lighter;
+				width: 100%;
+				line-height: 16px;
+				font-size: 12px;
+				text-align: right;
+				position: absolute;
+				bottom: -16px;
+				right: 0;
+				color: grey;
+				font-family: sans-serif;
+			}
+			#messages img {
+				display: block;
+				border-radius: 8px;
+				width: calc(100% + 40px);
+				background-color: rgb(255, 255, 255);
+			}
+			[option="delete"] {
+				cursor: pointer;
+				position: absolute;
+				right: 8px;
+				top: 8px;
+				width: 26px;
+				height: 18px;
+				background-color: transparent;
+				background-image: url("{% static 'svg/down.svg' %}");
+				background-position: center;
+				background-size: contain;
+				background-repeat: no-repeat;
+			}
+			[option="delete"]:hover {
+				filter: brightness(0.4);
+			}
+			[option="delete"]:active {
+				filter: brightness(1);
+			}
+			[menu="message"] h1 {
+				margin-top: -18px;
+				float: right;
+				cursor: pointer;
+				width: 26px;
+				height: 18px;
+				background-color: transparent;
+				background-image: url("{% static 'svg/down.svg' %}");
+				background-position: center;
+				background-size: contain;
+				background-repeat: no-repeat;
+				transform: rotate(180deg);
+			}
+			[menu="message"] h1:hover {
+				filter: brightness(0.6);
+			}
+			[menu="message"] h1:active {
+				filter: brightness(0.9);
+			}
+			[menu="message"] {
+				z-index: 20;
+				display: none;
+				position: absolute;
+				top: 0px;
+				right: 4px;
+				background-color: white;
+				padding: 0;
+				padding-top: 18px;
+				border-radius: 4px 0px 4px 4px;
+				overflow: hidden;
+				animation-name: delete-message;
+				animation-duration: 0.2s;
+				animation-fill-mode: forwards;
+				box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.261);
+			}
+			@keyframes delete-message {
+				0% {top: 2px;}
+				100% {
+					top: 6px;
+				}
+			}
+			[menu="message"] h2 {
+				padding: 12px 28px;
+				cursor: pointer;
+				font-size: 14px;
+				width: fit-content;
+				max-width: 200%;
+				line-height: 14px;
+				margin: 0;
+				color: rgb(163, 163, 163);
+			}
+			[menu="message"] h2:hover {
+				background-color: rgb(235, 235, 235);
+				color: black;
+			}
+			[menu="message"] h2:active {
+				background-color: rgb(111, 111, 111);
+				color: white;
+			}
+
+			.uploader {
+				z-index: 18;
+				display: none;
+				border-radius: 8px;
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: calc(100%);
+				background-color: rgb(255, 255, 255);
+				animation-name: uploader;
+				animation-duration: 1s;
+				animation-fill-mode: forwards;
+			}
+			.uploader h2 {
+				cursor: pointer;
+				position: absolute;
+				top: 18px;
+				left: 18px;
+				width: 50px;
+				height: 50px;
+				background-color: rgb(189, 189, 189);
+				border-radius: 50%;
+				background-position: center;
+				background-repeat: no-repeat;
+				background-image: url("{% static 'images/close_white.png' %}");
+			}
+			.uploader h2:hover {
+				background-color: rgb(162, 88, 88);
+			}
+			.uploader button {
+				cursor: pointer;
+				position: absolute;
+				bottom: 30px;
+				right: 30px;
+				width: 90px;
+				height: 90px;
+				background-color: rgb(0, 187, 106);
+				border-radius: 50%;
+				border: none;
+				background-position: center;
+				background-repeat: no-repeat;
+				background-size: 60%;
+				outline: none;
+				background-image: url("{% static 'svg/send_white.svg' %}");
+			}
+			.uploader button:hover {
+				filter: saturate(1.6);
+			}
+			@keyframes uploader {
+				0% {top: 100%;}
+				100% {top: 0;}
+			}
+			.uploader img {
+				border-radius: 4px;
+				width: 60%;
+				margin-top: 80px;
+				margin-left: calc(20%);
+				background-color: rgb(240, 240, 240);
+				/* height: 12px; */
+			}
+
+			@keyframes profile {
+				0% {top: 100%;}
+				100% {top: 12px;}
+			}
+
+			.profile {
+				z-index: 18;
+				display: none;
+				border-radius: 8px;
+				position: absolute;
+				top: 0;
+				left: calc(50vw - 300px);
+				width: 400px;
+				height: auto;
+				background-color: rgb(255, 255, 255);
+				animation-name: profile;
+				animation-duration: 1s;
+				animation-fill-mode: forwards;
+				padding-bottom: 40px;
+				box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.35);
+			}
+			.profile h2 {
+				cursor: pointer;
+				position: absolute;
+				top: 18px;
+				left: 18px;
+				width: 50px;
+				height: 50px;
+				background-color: rgb(189, 189, 189);
+				border-radius: 50%;
+				background-position: center;
+				background-repeat: no-repeat;
+				background-image: url("{% static 'images/close_white.png' %}");
+			}
+			.profile h2:hover {
+				background-color: rgb(162, 88, 88);
+			}
+			.profile button {
+				cursor: pointer;
+				position: absolute;
+				height: 46px;
+				bottom: 30px;
+				right: 30px;
+				background-color: rgb(0, 187, 106);
+				border-radius: 4px;
+				border: none;
+				outline: none;
+				line-height: 46px;
+				font-size: 16px;
+				color: white;
+				font-weight: bold;
+			}
+			.profile button:hover {
+				filter: saturate(1.6);
+			}
+			.profile img {
+				border-radius: 50%;
+				width: 200px;
+				height: 200px;
+				object-fit: cover;
+				margin-top: 40px;
+				margin-left: calc(20%);
+				background-color: rgb(240, 240, 240);
+				box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.357);
+				/* height: 12px; */
+			}
+
+
+
+			.doodle_attribution {
+				position: absolute;
+				text-align: center;
+				width: calc(100% - 40px);
+				padding-top: 4px;
+				padding-bottom: 4px;
+				height: 14px;
+				top: 8px;
+				line-height: 14px;
+				font-size: 14px;
+				font-family: sans-serif;
+			}
+			.edit_container {
+				border-radius: 0px 0px 8px 8px;
+				background-color: rgb(220, 220, 220);
+				width: calc(100% - 80px);
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				height: fit-content;
+				max-height: 60px;
+				display: grid;
+				padding: 12px 40px;
+				column-gap: 24px;
+				grid-template-columns: calc(60px) calc(100% - 140px) calc(60px);
+			}
+			.edit_container input {
+				display: none;
+			}
+			.edit_container textarea {
+				margin-top: 0;
+				border-radius: 30px;
+				height: 24px;
+				border: none;
+				line-height: 16px;
+				outline: none;
+				font-size: 16px;
+				padding: 18px 18px;
+				/* padding-top: 12px; */
+				font-weight: bold;
+				font-family: 'Titillium Web';
+			}
+			.edit_container div {
+				cursor: pointer;
+				width: 40px;
+				height: 40px;
+				margin-top: 8px;
+				background-color: transparent;
+				background-image: url("{% static 'svg/clip.svg' %}");
+				background-position: center;
+				background-size: contain;
+				background-repeat: no-repeat;
+			}
+			.edit_container div:hover {
+				filter: brightness(0.6);
+			}
+			.edit_container div:active {
+				filter: brightness(0.9);
+			}
+			.edit_container button {
+				width: 40px;
+				height: 40px;
+				margin-top: 8px;
+				background-color: grey;
+				background-color: transparent;
+				background-image: url("{% static 'svg/send.svg' %}");
+				background-position: center;
+				background-size: contain;
+				background-repeat: no-repeat;
+				outline: none;
+				border: none;
+			}
+			.edit_container button:hover {
+				transform: translate(0px, 0px);
+				box-shadow: none;
+				filter: brightness(0.6);
+			}
+			.edit_container button:active {
+				filter: brightness(0.9);
+			}
+		</style>
+	  </head>
+	<body>
+		<div class="profile">
+			<h2></h2>
+			<img>
+			<button>save pic</button>
+		</div>
+		<div id="side_bar">
+			<div class="profile_pic">
+				<img>
+				<div class="change_photo">
+					<input type="file"></input>
+				</div>
+			</div>
+			<div class="profile_name">
+				<h1>{{ user }}</h1>
+				<input type="text"></input>
+			</div>
+			<div class="room_name">
+				<h1></h1>
+				<input type="text"></input>
+			</div>
+			<div class="change_room">
+				<h1>change room</h1>
+			</div>
+			<div class="delete_room">
+				<h1>delete room</h1>
+			</div>
+			<h2 class="logout">Logout</h2>
+			<h2 class="account">Account</h2>
+		</div>
+		<div id="rooms">
+			<h1>Active Rooms</h1>
+			<ul>
+				{% for room in rooms %}
+					<li room_id="{{ room.id }}">{{ room.name }}</li>
+				{% endfor %}
+			</ul>
+			<button>create new room</button>
+		</div>
+		<div id="users">
+			<h1>Users</h1>
+			<ul>
+			</ul>
+		</div>
+
+		<div id="chat">
+			<ul id="messages">
+			</ul>
+			<div class="uploader">
+				<h2></h2>
+				<img>
+				<button></button>
+			</div>
+			<div class="doodle_attribution">
+				<a href="https://www.vecteezy.com/free-vector/pattern" target="_blank">Pattern Vectors by Vecteezy</a>
+			</div>
+			<div class="edit_container">
+				<div>
+					<input type="file" accept=".png,.jpg"></input>
+				</div>
+				<textarea name="" id="" cols="30" rows="10" placeholder="Write a new message"></textarea>
+				<button></button>
+			</div>
+		</div>
+		<script>
+			let roomId = 'undefined';
+			window.onload = function () {
+				let imgB64String;
+				const logout = document.querySelector('.logout');
+				logout.addEventListener('click', function () {
+					window.location.replace('/login');
+				});
+				const addRoom = document.querySelector('#rooms button');
+				addRoom.addEventListener('click', async function (evn) {
+					createRoom();
+				});
+				const changeRoom = document.querySelector('.change_room');
+				const deleteRoombtn = document.querySelector('.delete_room');
+				const nameRoombtn = document.querySelector('.room_name');
+				changeRoom.addEventListener('click', async function () {
+					renderRooms(await getRooms());
+					document.querySelector('#users').style.display = 'none';
+					document.querySelector('#chat').style.display = 'none';
+					changeRoom.style.display = 'none';
+					deleteRoombtn.style.display = 'none';
+					nameRoombtn.style.display = 'none';
+				});
+				deleteRoombtn.addEventListener('click', async function () {
+					const conf = confirm('Are you sure about deleting this Room?');
+					if (conf) {
+						await deleteRoom();
+						await renderRooms(await getRooms());
+						document.querySelector('#users').style.display = 'none';
+						document.querySelector('#chat').style.display = 'none';
+						changeRoom.style.display = 'none';
+						deleteRoombtn.style.display = 'none';
+						nameRoombtn.style.display = 'none';
+					}
+				});
+				nameRoombtn.querySelector('h1').addEventListener('click', function (evn) {
+					nameRoombtn.querySelector('input').style.display = 'block';
+					nameRoombtn.querySelector('input').value = evn.target.innerHTML;
+					nameRoombtn.querySelector('input').focus();
+				});
+				nameRoombtn.querySelector('input').addEventListener('keyup', async function (evn) {
+					if (evn.keyCode === 13) {
+						await saveRoomName(evn.target.value);
+						evn.target.style.display = 'none';
+						nameRoombtn.querySelector('h1').innerHTML = evn.target.value;
+						evn.target.value = '';
+						// evn.target.blur();
+					}
+				});
+				nameRoombtn.querySelector('input').addEventListener('focusout', function (evn) {
+					evn.target.style.display = 'none';
+				});
+				setRoomsListeners();
+				const editor = document.querySelector('.edit_container');
+				editor.querySelector('button').addEventListener('click', async function () {
+					const messageInput = editor.querySelector('textarea');
+					console.log(messageInput.value);
+					console.log('Send message');
+					if (messageInput.value !== '') {
+						await sendMessage(messageInput.value);
+						messageInput.value = '';
+					}
+				});
+				editor.querySelector('div').addEventListener('click', function (evn) {
+					editor.querySelector('input').click();
+				});
+				editor.querySelector('input').addEventListener('change', function (evn) {
+					if (evn.target.files && evn.target.files.length > 0) {
+						const file = evn.target.files[0];
+						renderImageUploader(file, document.querySelector('.uploader img'));
+					}
+					evn.target.value = '';
+					document.querySelector('.uploader').style.display = 'block';
+				});
+				document.querySelector('.uploader h2').addEventListener('click', function () {
+					document.querySelector('.uploader').style.display = 'none';
+				});
+				document.querySelector('.uploader button').addEventListener('click', async function (evn) {
+					console.log('uploade image');
+					await uploadImage('message');
+					// console.log(roomId);
+					loadMessages();
+					document.querySelector('.uploader').style.display = 'none';
+				});
+				const profilePic = document.querySelector('.profile_pic');
+				profilePic.addEventListener('mousemove', function () {
+					profilePic.querySelector('.change_photo').style.display = 'block';
+				});
+				profilePic.addEventListener('mouseleave', function () {
+					profilePic.querySelector('.change_photo').style.display = 'none';
+				});
+				profilePic.querySelector('.change_photo').addEventListener('click', function () {
+					profilePic.querySelector('.change_photo input').click();
+				});
+				profilePic.querySelector('.change_photo input').addEventListener('change', function (evn) {
+					if (evn.target.files && evn.target.files.length > 0) {
+						const file = evn.target.files[0];
+						renderImageUploader(file, document.querySelector('.profile img'));
+					}
+					evn.target.value = '';
+					document.querySelector('.profile').style.display = 'block';
+				});
+				document.querySelector('.profile h2').addEventListener('click', function () {
+					document.querySelector('.profile').style.display = 'none';
+				});
+				document.querySelector('.profile button').addEventListener('click', async function (evn) {
+					console.log('uploade image');
+					await uploadImage('profile');
+					fetchMedia('profile', {
+						object: profilePic.querySelector('img'),
+						id: 0
+					})
+					if (roomId !== 'undefined') {
+						await getUsers(roomId);
+					}
+					document.querySelector('.profile').style.display = 'none';
+				});
+				fetchMedia('profile', {
+					object: profilePic.querySelector('img'),
+					id: 0
+				});
+				const profileName = document.querySelector('.profile_name');
+				profileName.querySelector('h1').addEventListener('click', function (evn) {
+					profileName.querySelector('input').style.display = 'block';
+					profileName.querySelector('input').value = evn.target.innerHTML;
+					profileName.querySelector('input').focus();
+				});
+				profileName.querySelector('input').addEventListener('keypress', async function (evn) {
+					if (evn.keyCode === 13) {
+						await saveUsername(evn.target.value)
+						console.log('save username: ', evn.target.value);
+						evn.target.style.display = 'none';
+						profileName.querySelector('h1').innerHTML = evn.target.value;
+						if (roomId != 'undefined') {
+							await getUsers(roomId);
+						}
+
+					}
+				});
+				profileName.querySelector('input').addEventListener('focusout', async function (evn) {
+					evn.target.style.display = 'none';
+					profileName.querySelector('h1').innerHTML = evn.target.value;
+					await saveUsername(evn.target.value)
+				});
+			}
+			async function saveUsername (username) {
+				const req = await fetch(
+					`http://localhost:8000/users`,
+					{
+						method: 'PUT',
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': `Token ${localStorage.getItem('token')}`
+						},
+						body: JSON.stringify({
+							'username': username
+						})
+					}
+				);
+				// console.log(await req.json());
+				if (req.status === 200) {
+					const res = await req.json();
+					console.log(res);
+				}
+			}
+			async function createRoom () {
+				console.log(localStorage.getItem('token'));
+				const req = await fetch(
+					`http://localhost:8000/rooms`,
+					{
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': `Token ${localStorage.getItem('token')}`
+						}
+					}
+				);
+				// console.log(await req.json());
+				if (req.status === 200) {
+					const res = await req.json();
+					renderRoom(res.id, res.name);
+				}
+			}
+			async function saveRoomName (name) {
+				console.log(name);
+				const req = await fetch(
+					`http://localhost:8000/rooms`,
+					{
+						method: 'PUT',
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': `Token ${localStorage.getItem('token')}`
+						},
+						body: JSON.stringify({
+							name: name,
+							id: roomId
+						})
+					}
+				);
+			}
+			async function getRooms () {
+				console.log('getRooms');
+				const req = await fetch(
+					`http://localhost:8000/rooms`,
+					{
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': `Token ${localStorage.getItem('token')}`
+						}
+					}
+				);
+				if (req.status === 200) {
+					const res = await req.json();
+					console.log(res);
+					return res.rooms;
+				} else {
+					console.log(req);
+					return {};
+				}
+			}
+			async function renderRooms (rooms) {
+				console.log(rooms);
+				const roomsEl = document.getElementById('rooms');
+				const ul = roomsEl.querySelector('ul');
+				ul.innerHTML = '';
+				for (const room of rooms) {
+					const li = document.createElement('li');
+					li.setAttribute('room_id', room.id);
+					li.innerHTML = room.name;
+					ul.appendChild(li);
+				}
+				setTimeout(function () {
+					roomsEl.style.display = 'block';
+					setRoomsListeners();
+				}, 100);
+				
+			}
+			async function deleteRoom () {
+				console.log('delete rooms');
+				const req = await fetch(
+					`http://localhost:8000/rooms/${roomId}/`,
+					{
+						method: 'DELETE',
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': `Token ${localStorage.getItem('token')}`
+						}
+					}
+				);
+				if (req.status === 200) {
+					const res = await req.json();
+					console.log(res);
+				} else {
+					
+				}
+			}
+			function setRoomsListeners () {
+				const rooms = document.querySelectorAll('#rooms li');
+				for (const room of rooms) {
+					room.addEventListener('click', function (evn) {
+						renderRoom(evn.target.getAttribute('room_id'), evn.target.innerHTML);
+					});
+				}
+			}
+			async function renderRoom (id, name) {
+				roomId = id;
+				const changeRoom = document.querySelector('.change_room');
+				changeRoom.style.display = 'block';
+				const deleteRoom = document.querySelector('.delete_room');
+				deleteRoom.style.display = 'block';
+				const nameRoom = document.querySelector('.room_name');
+				nameRoom.style.display = 'block';
+				console.log('Render room');
+				console.log(name)
+				document.querySelector('.room_name h1').innerHTML = name;
+				document.getElementById('rooms').style.display = 'none';
+				console.log(id);
+				await getUsers(id);
+				document.getElementById('chat').style.display = 'block';
+				await loadMessages();
+			}
+			async function uploadImage (type) {
+				const req = await fetch(
+					`http://localhost:8000/media/`,
+					{
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': `Token ${localStorage.getItem('token')}`
+						},
+						body: JSON.stringify({
+							data: imgB64String,
+							type: type,
+							roomId: roomId
+						})
+					}
+				);
+				const res = await req.json();
+				console.log(res);
+				return res;
+			}
+			async function renderImageUploader (file, img) {
+				const readHandler = async function (evn) {
+					let data = '';
+					let bytes = new Uint8Array(evn.target.result);
+					let length = bytes.byteLength;
+					for (let i = 0; i < length; i++) {
+						data += String.fromCharCode(bytes[i])
+					}
+					data = window.btoa(data);
+					imgB64String = data;
+					img.src = `data:image/png;base64,${data}`;
+				}
+				let r = new FileReader();
+				let blob = file.slice(0, file.size);
+				r.onload = readHandler;
+				r.readAsArrayBuffer(blob);
+			}
+			async function sendMessage (message) {
+				const req = await fetch(
+					`http://localhost:8000/rooms/${roomId}/messages/`,
+					{
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': `Token ${localStorage.getItem('token')}`
+						},
+						body: JSON.stringify({
+							content: message
+						})
+					}
+				);
+				if (req.status === 200) {
+					loadMessages();
+				}
+
+			}
+			async function loadMessages () {
+				const req = await fetch(
+					`http://localhost:8000/rooms/${roomId}/messages/all`,
+					{
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': `Token ${localStorage.getItem('token')}`
+						}
+					}
+				);
+				console.log(req.status);
+				const res = await req.json();
+				renderMessages(res.messages, res.id);
+				console.log(res);
+			}
+			async function renderMessages (messages, id) {
+				const ul = document.querySelector('#messages');
+				ul.innerHTML = '';
+				const first = document.createElement('li');
+				first.innerHTML = '<h1>Welcome and Hi!!, start talking with your peers</h1>';
+				first.classList.add('first');
+				ul.appendChild(first);
+				for (const message of messages) {
+					const mId = message.id;
+					const li = document.createElement('li');
+					let menu = '';
+					let mine = '';
+					let owner = message.user
+					if (id === message.user_id) {
+						li.classList.add('mine');
+						owner = 'me'
+						menu = `
+								<div option="delete"></div>
+								<div menu="message">
+									<h1></h1>
+									<h2 user_id="${id}">Delete Message</h2>
+								</div>`;
+						mine = 'mine';
+					}
+					let media = '';
+					if (message.media) {
+						media = `<img>`
+					}
+					const date = new Date(message.created_at).toISOString().split('T')[1].slice(0, 5);
+					li.innerHTML = `<div cont="message">
+								${menu}
+								<h3>${owner}</h3>
+								${media}
+								<p>${message.content}</p>
+								<h4>${date}</h4>
+								</div>`;
+					if (id === message.user_id) {
+						const optionBtn = li.querySelector('[option="delete"]');
+						optionBtn.addEventListener('click', function (evn) {
+							li.querySelector('[menu="message"]').style.display = 'block';
+						});
+						const closeBtn = li.querySelector('[menu="message"] h1');
+						closeBtn.addEventListener('click', function (evn) {
+							li.querySelector('[menu="message"]').style.display = 'none';
+						});
+						const deleteBtn = li.querySelector('[menu="message"] h2');
+						deleteBtn.addEventListener('click', function (evn) {
+							const messageId = message.id;
+							const conf = confirm('Are you sure about deleting this message?');
+							if (conf) {
+								removeMessage(messageId);
+							} else {
+								li.querySelector('[menu="message"]').style.display = 'none';
+							}
+							// li.querySelector('[menu="message"]').style.display = 'none';
+						});
+					}
+					ul.appendChild(li);
+					if (message.media) {
+						const img = li.querySelector('img');
+						const obj = {id: message.id, object: img};
+						await fetchMedia('message', Object.assign({}, obj));
+					}
+				}
+				setTimeout(function () {
+					const lastIndex = ul.querySelectorAll('li').length - 1;
+					const lastLi = ul.querySelectorAll('li')[lastIndex];
+					// console.log(lastLi.offsetTop, ul.scrollTop, ul.scrollHeight);
+					ul.scrollTop = ul.scrollHeight;
+				}, 200);
+				
+				// lastLi.scrollTop = ul.scrollHeight;
+				// ul.scrollTop = ul.scrollHeight;
+				// lastLi.focus();
+				// lastLi.scrollIntoView(false);
+				
+			}
+			async function fetchMedia (type, obj) {
+				const req = await fetch(
+					`http://localhost:8000/media/${obj.id}?type=${type}`,
+					{
+						method: 'GET',
+						headers: {
+							'Authorization': `Token ${localStorage.getItem('token')}`
+						}
+					}
+				);
+				const res = await req.blob();
+				obj.object.src = window.URL.createObjectURL(res);
+				// console.log(res);
+			}
+			async function removeMessage (messageId) {
+				const req = await fetch(
+					`http://localhost:8000/messages/${messageId}/`,
+					{
+						method: 'DELETE',
+						headers: {
+							'Authorization': `Token ${localStorage.getItem('token')}`
+						}
+					}
+				);
+				const res = await req.json();
+				console.log(res);
+				loadMessages();
+			}
+			async function getUsers (id) {
+				console.log(id);
+				const req = await fetch(
+					`http://localhost:8000/rooms/${id}/users`,
+					{
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': `Token ${localStorage.getItem('token')}`
+						}
+					}
+				);
+				const res = await req.json();
+				console.log(res);
+				document.getElementById('users').style.display = 'block';
+				renderUsers(res.users);
+			}
+			function renderUsers (users) {
+				const cont = document.querySelector('#users ul');
+				cont.innerHTML = '';
+				for (const user of users) {
+					const li = document.createElement('li');
+					const time = `${user.last_login.split('T')[1].split('.')[0]}`;
+					const date = `${user.last_login.split('T')[0]}`;
+					li.innerHTML = `<img><h1>${user.username}</h1><h2>Last login: ${time} / ${date}</h2>`;
+					cont.appendChild(li);
+					fetchMedia('profile', {
+						object: li.querySelector('img'),
+						id: user.id
+					})
+				}
+			}
+		</script>
+	</body>
+</html>

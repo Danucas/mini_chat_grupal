@@ -1,0 +1,6 @@
+Django
+djangorestframework
+# psycopg2-binary
+django-bootstrap4
+Psycopg2
+django-cors-headers
