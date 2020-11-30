@@ -82,7 +82,7 @@
 				animation-duration: 0.5s;
 				animation-name: fade-in-photo;
 				animation-fill-mode: forwards;
-				background-image: url("{% static 'svg/pen.svg' %}");
+				background-image: url(/api/static/svg/pen.svg);
 				background-repeat: no-repeat;
 				background-position: center;
 				background-size: 30%;
@@ -408,7 +408,7 @@
 				overflow-y: scroll;
 				overflow-x: hidden;
 				scroll-behavior: smooth;
-				background-image: url("{% static 'svg/doodle.svg' %}");
+				background-image: url(/api/static/svg/doodle.svg);
 				background-position: center;
 				background-size: cover;
 				background-repeat: no-repeat;
@@ -504,7 +504,7 @@
 				width: 26px;
 				height: 18px;
 				background-color: transparent;
-				background-image: url("{% static 'svg/down.svg' %}");
+				background-image: url(/api/static/svg/down.svg);
 				background-position: center;
 				background-size: contain;
 				background-repeat: no-repeat;
@@ -522,7 +522,7 @@
 				width: 26px;
 				height: 18px;
 				background-color: transparent;
-				background-image: url("{% static 'svg/down.svg' %}");
+				background-image: url(/api/static/svg/down.svg);
 				background-position: center;
 				background-size: contain;
 				background-repeat: no-repeat;
@@ -600,7 +600,7 @@
 				border-radius: 50%;
 				background-position: center;
 				background-repeat: no-repeat;
-				background-image: url("{% static 'images/close_white.png' %}");
+				background-image: url(/api/static/images/close_white.png);
 			}
 			.uploader h2:hover {
 				background-color: rgb(162, 88, 88);
@@ -619,7 +619,7 @@
 				background-repeat: no-repeat;
 				background-size: 60%;
 				outline: none;
-				background-image: url("{% static 'svg/send_white.svg' %}");
+				background-image: url(/api/static/svg/send_white.svg);
 			}
 			.uploader button:hover {
 				filter: saturate(1.6);
@@ -669,7 +669,7 @@
 				border-radius: 50%;
 				background-position: center;
 				background-repeat: no-repeat;
-				background-image: url("{% static 'images/close_white.png' %}");
+				background-image: url(/api/static/images/close_white.png);
 			}
 			.profile h2:hover {
 				background-color: rgb(162, 88, 88);
@@ -754,7 +754,7 @@
 				height: 40px;
 				margin-top: 8px;
 				background-color: transparent;
-				background-image: url("{% static 'svg/clip.svg' %}");
+				background-image: url(/api/static/svg/clip.svg);
 				background-position: center;
 				background-size: contain;
 				background-repeat: no-repeat;
@@ -771,7 +771,7 @@
 				margin-top: 8px;
 				background-color: grey;
 				background-color: transparent;
-				background-image: url("{% static 'svg/send.svg' %}");
+				background-image: url(/api/static/svg/send.svg);
 				background-position: center;
 				background-size: contain;
 				background-repeat: no-repeat;
@@ -858,7 +858,10 @@
 				let imgB64String;
 				const logout = document.querySelector('.logout');
 				logout.addEventListener('click', function () {
-					window.location.replace('/login');
+					localStorage.removeItem('token');
+					localStorage.removeItem('user_id');
+					localStorage.removeItem('username');
+					window.location.replace('/api/login');
 				});
 				const addRoom = document.querySelector('#rooms button');
 				addRoom.addEventListener('click', async function (evn) {
@@ -999,7 +1002,7 @@
 			}
 			async function saveUsername (username) {
 				const req = await fetch(
-					`http://localhost:8000/users`,
+					`${ENV_API_URL}/users`,
 					{
 						method: 'PUT',
 						headers: {
@@ -1020,7 +1023,7 @@
 			async function createRoom () {
 				console.log(localStorage.getItem('token'));
 				const req = await fetch(
-					`http://localhost:8000/rooms`,
+					`${ENV_API_URL}/rooms`,
 					{
 						method: 'POST',
 						headers: {
@@ -1038,7 +1041,7 @@
 			async function saveRoomName (name) {
 				console.log(name);
 				const req = await fetch(
-					`http://localhost:8000/rooms`,
+					`${ENV_API_URL}/rooms`,
 					{
 						method: 'PUT',
 						headers: {
@@ -1055,7 +1058,7 @@
 			async function getRooms () {
 				console.log('getRooms');
 				const req = await fetch(
-					`http://localhost:8000/rooms`,
+					`${ENV_API_URL}/rooms`,
 					{
 						method: 'GET',
 						headers: {
@@ -1093,7 +1096,7 @@
 			async function deleteRoom () {
 				console.log('delete rooms');
 				const req = await fetch(
-					`http://localhost:8000/rooms/${roomId}/`,
+					`${ENV_API_URL}/rooms/${roomId}/`,
 					{
 						method: 'DELETE',
 						headers: {
@@ -1136,7 +1139,7 @@
 			}
 			async function uploadImage (type) {
 				const req = await fetch(
-					`http://localhost:8000/media/`,
+					`${ENV_API_URL}/media/`,
 					{
 						method: 'POST',
 						headers: {
@@ -1173,7 +1176,7 @@
 			}
 			async function sendMessage (message) {
 				const req = await fetch(
-					`http://localhost:8000/rooms/${roomId}/messages/`,
+					`${ENV_API_URL}/rooms/${roomId}/messages/`,
 					{
 						method: 'POST',
 						headers: {
@@ -1192,7 +1195,7 @@
 			}
 			async function loadMessages () {
 				const req = await fetch(
-					`http://localhost:8000/rooms/${roomId}/messages/all`,
+					`${ENV_API_URL}/rooms/${roomId}/messages/all`,
 					{
 						method: 'GET',
 						headers: {
@@ -1285,7 +1288,7 @@
 			}
 			async function fetchMedia (type, obj) {
 				const req = await fetch(
-					`http://localhost:8000/media/${obj.id}?type=${type}`,
+					`${ENV_API_URL}/media/${obj.id}?type=${type}`,
 					{
 						method: 'GET',
 						headers: {
@@ -1299,7 +1302,7 @@
 			}
 			async function removeMessage (messageId) {
 				const req = await fetch(
-					`http://localhost:8000/messages/${messageId}/`,
+					`${ENV_API_URL}/messages/${messageId}/`,
 					{
 						method: 'DELETE',
 						headers: {
@@ -1314,7 +1317,7 @@
 			async function getUsers (id) {
 				console.log(id);
 				const req = await fetch(
-					`http://localhost:8000/rooms/${id}/users`,
+					`${ENV_API_URL}/rooms/${id}/users`,
 					{
 						method: 'GET',
 						headers: {

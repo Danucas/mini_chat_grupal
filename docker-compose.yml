@@ -9,13 +9,18 @@ services:
       - 8000:8000
     depends_on:
       - db
+    environment:
+#       - API_URL=http://localhost:8000/api
+       - API_URL=http://13.59.57.0/api
   db:
     image: postgres:12-alpine
-    # volumes:
-    #   - postgres_data:/var/lib/postgresql/data/
+    volumes:
+     - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=mini_chat_dev
       - POSTGRES_PASSWORD=mini_chat_passwd
       - POSTGRES_DB=mini_chat_dev_db
       - TZ=America/Bogota
 
+volumes:
+  postgres_data:

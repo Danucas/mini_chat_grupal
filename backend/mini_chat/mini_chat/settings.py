@@ -89,7 +89,7 @@ DATABASES = {
         'NAME': 'mini_chat_dev_db',
         'USER': 'mini_chat_dev',
         'PASSWORD': 'mini_chat_passwd',
-        'HOST': '172.19.0.2',
+        'HOST': 'db',
         'PORT': '5432'
     }
 }

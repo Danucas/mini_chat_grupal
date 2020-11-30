@@ -6,6 +6,7 @@ import Login from './Login';
 import ChatRoom from './ChatRoom';
 import reportWebVitals from './reportWebVitals';
 
+// console.log(process.env.REACT_APP_API_URL);
 
 if (localStorage.getItem('token')) {
 	ReactDOM.render(
@@ -25,6 +26,6 @@ if (localStorage.getItem('token')) {
 
 
 // If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
+// to log results (for example: reportWebVitals(// console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();

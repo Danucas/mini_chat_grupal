@@ -6,7 +6,10 @@ class Command(BaseCommand):
     Creates the admin user
     """
     def handle(self, *args, **kwargs):
-        user = User()
-        user.__class__.objects.create_superuser('admin', 'admin@mail.com', 'admin')
-        user.password = 'admin'
-        user.save()
+        try:
+            user = User.objects.get(email="admin@mail.com")
+        except Exception as e:
+            user = User()
+            user.__class__.objects.create_superuser('admin', 'admin@mail.com', 'admin')
+            user.password = 'admin'
+            user.save()

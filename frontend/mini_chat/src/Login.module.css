@@ -1,7 +1,7 @@
 body {
 	background-color: rgb(211, 211, 211);
 }
-form {
+.form {
 	font-family: 'Titillium Web', sans-serif;
 	padding: 12px 40px 20px 40px;
 	background-color: white;
@@ -19,7 +19,7 @@ form {
 	100% {top: 80px}
 
 }
-form h1 {
+.form h1 {
 	width: 100%;
 	text-align: center;
 	font-size: 20px;
@@ -29,7 +29,7 @@ form h1 {
 	text-align: center;
 	margin-top: 4px;
 }
-form a {
+.form a {
 	width: 100% !important;
 	text-align: center !important;
 	font-size: 14px;
@@ -38,10 +38,10 @@ form a {
 	color: black;
 	font-weight: bold;
 }
-form a:hover {
+.form a:hover {
 	color: rgb(1, 138, 108);
 }
-form a:active {
+.form a:active {
 	color: rgb(18, 85, 71);
 }
 .error {

@@ -37,7 +37,7 @@ export default class Login extends Component {
 		);
 	}
 	componentDidMount () {
-		console.log(styles.error);
+		// console.log(styles.error);
 		const root = this.rootRef;
 		const inputs = root.current.querySelectorAll('input');
 		for (const inp of inputs) {
@@ -56,15 +56,15 @@ export default class Login extends Component {
 		});
 		root.current.querySelector('form').addEventListener('submit', async function (evn) {
 			evn.preventDefault();
-			console.log('request for token');
+			// console.log('request for token');
 			const data = new FormData(evn.target);
 			const credentials = {};
 			for (const key of data.keys()) {
 				credentials[key] = data.get(key);
 			}
-			console.log(credentials);
+			// console.log(credentials);
 			const req = await fetch(
-				`http://localhost:8000/api-token-auth/`,
+				`${process.env.REACT_APP_API_URL}/api-token-auth/`,
 				{
 					method: 'POST',
 					headers: {
@@ -84,12 +84,12 @@ export default class Login extends Component {
 					document.getElementById('root')
 				);
 			} else if (req.status === 404) {
-				console.log('Error generating token', await req.json());
+				// console.log('Error generating token', await req.json());
 				const error = root.current.querySelector(`.${styles.error}`);
 				error.innerHTML = 'Wrong user or password';
 				evn.target.reset();
 			} else {
-				console.log('User or password wrong');
+				// console.log('User or password wrong');
 				const error = root.current.querySelector(`.${styles.error}`);
 				error.innerHTML = 'Wrong user or password';
 				evn.target.reset();
@@ -139,16 +139,16 @@ export class Register extends Component {
 		}
 		root.querySelector('form').addEventListener('submit', async function (evn) {
 			evn.preventDefault();
-			console.log('request for token');
+			// console.log('request for token');
 			const data = new FormData(evn.target);
 			const credentials = {};
 			for (const key of data.keys()) {
 				credentials[key] = data.get(key);
 			}
-			console.log(credentials);
+			// console.log(credentials);
 			if (credentials.password === credentials.confirm) {
 				const req = await fetch(
-					`http://localhost:8000/register/`,
+					`${process.env.REACT_APP_API_URL}/register/`,
 					{
 						method: 'POST',
 						headers: {

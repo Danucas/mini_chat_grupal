@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
+from rest_framework.schemas import get_schema_view
 from rest_framework.authtoken import views as auth_views
 from api import views
 
@@ -26,19 +27,23 @@ router = routers.DefaultRouter()
 # router.register(r'rooms', views.RoomViewSet)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api-token-auth/', views.get_token),
-    path('', include(router.urls)),
-    path('users', views.users),
-    path('login/', views.login, name='login'),
-    path('register/', views.register, name='register'),
-    path('dashboard', views.dashboard, name='dashboard'),
-    path('rooms', views.rooms, name='rooms'),
-    path('rooms/<int:roomId>/', views.rooms_delete, name='rooms_delete'),
-    path('rooms/<int:id>/users', views.rooms_users, name='rooms_users'),
-    path('rooms/<int:roomId>/messages/all/', views.messages_get, name='rooms_messages'),
-    path('rooms/<int:roomId>/messages/', views.messages_post, name='rooms_messages'),
-    path('messages/<int:messId>/', views.messages_del, name='rooms_messages_delete'),
-    path('media/', views.media_post, name='rooms_media_upload'),
-    path('media/<int:media_id>', views.media_get, name='rooms_media_get')
+    path('api/admin/', admin.site.urls),
+    path('api/api-token-auth/', views.get_token),
+    path('api/', get_schema_view(
+        title='Mini chat API Schema',
+        description='API to manager rooms messages and user authentication',
+        version='1.0.0',
+    ), name='openapi_schema'),
+    path('api/users', views.users),
+    path('api/login/', views.login, name='login'),
+    path('api/register/', views.register, name='register'),
+    path('api/dashboard', views.dashboard, name='dashboard'),
+    path('api/rooms', views.rooms, name='rooms'),
+    path('api/rooms/<int:roomId>/', views.rooms_delete, name='rooms_delete'),
+    path('api/rooms/<int:id>/users', views.rooms_users, name='rooms_users'),
+    path('api/rooms/<int:roomId>/messages/all/', views.messages_get, name='rooms_messages'),
+    path('api/rooms/<int:roomId>/messages/', views.messages_post, name='rooms_messages'),
+    path('api/messages/<int:messId>/', views.messages_del, name='rooms_messages_delete'),
+    path('api/media/', views.media_post, name='rooms_media_upload'),
+    path('api/media/<int:media_id>', views.media_get, name='rooms_media_get')
 ]

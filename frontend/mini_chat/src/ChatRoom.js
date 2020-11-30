@@ -80,7 +80,7 @@ export default class ChatRoom extends Component {
 			localStorage.removeItem('token');
 			localStorage.removeItem('user_id');
 			localStorage.removeItem('username');
-			window.location.replace('/login');
+			window.location.replace('/');
 		});
 		const changeRoom = root.querySelector(`.${styles.change_room}`);
 		const nameRoom = root.querySelector(`.${styles.room_name}`);
@@ -190,7 +190,7 @@ export default class ChatRoom extends Component {
 		const comp = this;
 		console.log('getRooms');
 		const req = await fetch(
-			`http://localhost:8000/rooms`,
+			`${process.env.REACT_APP_API_URL}/rooms`,
 			{
 				method: 'GET',
 				headers: {
@@ -252,7 +252,7 @@ export default class ChatRoom extends Component {
 	}
 	async loadMessages () {
 		const req = await fetch(
-			`http://localhost:8000/rooms/${roomId}/messages/all/`,
+			`${process.env.REACT_APP_API_URL}/rooms/${roomId}/messages/all/`,
 			{
 				method: 'GET',
 				headers: {
@@ -275,7 +275,7 @@ export default class ChatRoom extends Component {
 	async getUsers (id) {
 		console.log(id);
 		const req = await fetch(
-			`http://localhost:8000/rooms/${id}/users`,
+			`${process.env.REACT_APP_API_URL}/rooms/${id}/users`,
 			{
 				method: 'GET',
 				headers: {
@@ -307,7 +307,7 @@ export default class ChatRoom extends Component {
 	}
 	async fetchMedia (type, obj) {
 		const req = await fetch(
-			`http://localhost:8000/media/${obj.id}?type=${type}`,
+			`${process.env.REACT_APP_API_URL}/media/${obj.id}?type=${type}`,
 			{
 				method: 'GET',
 				headers: {
@@ -393,7 +393,7 @@ export default class ChatRoom extends Component {
 	}
 	async sendMessage (message) {
 		const req = await fetch(
-			`http://localhost:8000/rooms/${roomId}/messages/`,
+			`${process.env.REACT_APP_API_URL}/rooms/${roomId}/messages/`,
 			{
 				method: 'POST',
 				headers: {
@@ -428,7 +428,7 @@ export default class ChatRoom extends Component {
 	}
 	async uploadImage (type) {
 		const req = await fetch(
-			`http://localhost:8000/media/`,
+			`${process.env.REACT_APP_API_URL}/media/`,
 			{
 				method: 'POST',
 				headers: {
@@ -448,7 +448,7 @@ export default class ChatRoom extends Component {
 	}
 	async saveUsername (username) {
 		const req = await fetch(
-			`http://localhost:8000/users`,
+			`${process.env.REACT_APP_API_URL}/users`,
 			{
 				method: 'PUT',
 				headers: {
@@ -467,112 +467,18 @@ export default class ChatRoom extends Component {
 			console.log(res);
 		}
 	}
+	async removeMessage (messageId) {
+		const req = await fetch(
+			`${process.env.REACT_APP_API_URL}/messages/${messageId}/`,
+			{
+				method: 'DELETE',
+				headers: {
+					'Authorization': `Token ${localStorage.getItem('token')}`
+				}
+			}
+		);
+		const res = await req.json();
+		console.log(res);
+		this.loadMessages();
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-// let roomId = 'undefined';
-// let imgB64String;
-// window.onload = function () {
-	
-
-// async function createRoom () {
-// 	console.log(localStorage.getItem('token'));
-// 	const req = await fetch(
-// 		`http://localhost:8000/rooms`,
-// 		{
-// 			method: 'POST',
-// 			headers: {
-// 				'Content-Type': 'application/json',
-// 				'Authorization': `Token ${localStorage.getItem('token')}`
-// 			}
-// 		}
-// 	);
-// 	// console.log(await req.json());
-// 	if (req.status === 200) {
-// 		const res = await req.json();
-// 		renderRoom(res.id, res.name);
-// 	}
-// }
-// async function saveRoomName (name) {
-// 	console.log(name);
-// 	const req = await fetch(
-// 		`http://localhost:8000/rooms`,
-// 		{
-// 			method: 'PUT',
-// 			headers: {
-// 				'Content-Type': 'application/json',
-// 				'Authorization': `Token ${localStorage.getItem('token')}`
-// 			},
-// 			body: JSON.stringify({
-// 				name: name,
-// 				id: roomId
-// 			})
-// 		}
-// 	);
-// }
-
-// 	setTimeout(function () {
-// 		roomsEl.style.display = 'block';
-// 		setRoomsListeners();
-// 	}, 100);
-	
-// }
-// async function deleteRoom () {
-// 	console.log('delete rooms');
-// 	const req = await fetch(
-// 		`http://localhost:8000/rooms/${roomId}/`,
-// 		{
-// 			method: 'DELETE',
-// 			headers: {
-// 				'Content-Type': 'application/json',
-// 				'Authorization': `Token ${localStorage.getItem('token')}`
-// 			}
-// 		}
-// 	);
-// 	if (req.status === 200) {
-// 		const res = await req.json();
-// 		console.log(res);
-// 	} else {
-		
-// 	}
-// }
-// function setRoomsListeners () {
-// 	const rooms = document.querySelectorAll('#rooms li');
-// 	for (const room of rooms) {
-// 		room.addEventListener('click', function (evn) {
-// 			renderRoom(evn.target.getAttribute('room_id'), evn.target.innerHTML);
-// 		});
-// 	}
-// }
-
-
-
-
-
-
-
-
-// async function removeMessage (messageId) {
-// 	const req = await fetch(
-// 		`http://localhost:8000/messages/${messageId}/`,
-// 		{
-// 			method: 'DELETE',
-// 			headers: {
-// 				'Authorization': `Token ${localStorage.getItem('token')}`
-// 			}
-// 		}
-// 	);
-// 	const res = await req.json();
-// 	console.log(res);
-// 	loadMessages();
-// }

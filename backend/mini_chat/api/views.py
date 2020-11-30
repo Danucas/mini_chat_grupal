@@ -1,5 +1,7 @@
-# from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-# from rest_framework.permissions import IsAuthenticated
+#!/usr/bin/python3
+"""
+API Endpoints for Mini_chat
+"""
 from django.contrib.auth.models import Group
 from django.shortcuts import render
 from django.utils import timezone
@@ -19,13 +21,13 @@ import json
 import os
 import uuid
 
+# Define a logger instance for debugging
 logger = logging.getLogger(__name__)
-
 
 @api_view(['GET', 'PUT'])
 def users(request):
     """
-    Register or checks an user
+    Update the username linked to the token
     """
     try:
         token = request.headers['Authorization'].split(' ')[1]
@@ -43,7 +45,6 @@ def users(request):
             'success': True
         })
     else:
-        print(request.method)
         return Response(data={
             'fail': 'no user'
         })
@@ -51,20 +52,21 @@ def users(request):
 @api_view(['GET', 'POST'])
 def login(request):
     """
-    Return the Log View
+    Return the Login HTML view
     """
     if request.method == 'GET':
-        return render(request, 'login.html', {})
+        return render(request, 'login.html', {'api_url': os.environ['API_URL']})
     elif request.method == 'POST':
         return Response(data=request.data)
 
 @api_view(['GET', 'POST'])
 def register(request):
     """
-    Register a new user
+    GET: return the register HTML view
+    POST: Register a new user storing 'username' and 'password' values from request body
     """
     if request.method == 'GET':
-        return render(request, 'register.html', {})
+        return render(request, 'register.html', {'api_url': os.environ['API_URL']})
     elif request.method == 'POST':
         user = User()
         tim = datetime.now()
@@ -84,6 +86,9 @@ def register(request):
 
 @api_view(['POST'])
 def get_token(request):
+    """
+    POST: Generates a unique token and return the user info 'id', and 'username
+    """
     try:
         user = User.objects.get(email=request.data['username'])
     except User.DoesNotExist as e:
@@ -91,9 +96,6 @@ def get_token(request):
             'error': 'User is not registered'
         }, status=status.HTTP_404_NOT_FOUND)
     if not (user.check_password(request.data['password'])):
-        logger.error('Password check fail')
-        logger.error(user.password)
-        logger.error(request.data['password'])
         if user.password != request.data['password']:
             return Response(data={
                     'error': 'Unauthorized'
@@ -129,7 +131,7 @@ def dashboard(request):
         #     'error': 'No authorized'
         # }, status=status.HTTP_401_UNAUTHORIZED)
         pass
-    # logger.error(tok.user_id)
+    # # logger.error(tok.user_id)
     rooms = Room.objects.all()
     rooms_obj = []
     for room in rooms:
@@ -137,7 +139,15 @@ def dashboard(request):
             'id': room.id,
             'name': room.name
         })
-    return render(request, 'dashboard.html', {'rooms': rooms_obj, 'user': 'admin'}) # User.objects.get(id=tok.user_id).username})
+        {'api_url': os.environ['API_URL']}
+    return render(
+        request,
+        'dashboard.html',
+        {
+            'rooms': rooms_obj,
+            'user': 'admin',
+            'api_url': os.environ['API_URL']
+        }) # User.objects.get(id=tok.user_id).username})
 
 
 @api_view(['GET', 'POST', 'PUT'])
@@ -185,7 +195,7 @@ def rooms_delete(request, *args, **kwargs):
     """
     CRUD for rooms
     """
-    logger.error('entra aqui')
+    # logger.error('entra aqui')
     try:
         token = request.headers['Authorization'].split(' ')[1]
         tok = Token.objects.get(key=token)
@@ -193,9 +203,9 @@ def rooms_delete(request, *args, **kwargs):
         return Response(data={
                 'error': 'Error retrieving token'
         }, status=status.HTTP_401_UNAUTHORIZED)
-    logger.error('entra aqui')
+    # logger.error('entra aqui')
     room = Room.objects.get(id=kwargs['roomId'])
-    logger.error(str(room))
+    # logger.error(str(room))
     room.delete()
     return Response(data={
         'success': True
@@ -236,7 +246,7 @@ def messages_get(request, *args, **kwargs):
     Return messages or store them by Room id
     """
     try:
-        logger.error(request.headers['Authorization'])
+        # logger.error(request.headers['Authorization'])
         token = request.headers['Authorization'].split(' ')[1]
         tok = Token.objects.get(key=token)
     except Exception as e:
@@ -248,11 +258,11 @@ def messages_get(request, *args, **kwargs):
             room = Room.objects.get(id=kwargs['roomId'])
             messages = Message.objects.all().filter(room=room.id).order_by('created_at')
             mess = []
-            logger.error(str(messages.values()))
+            # logger.error(str(messages.values()))
             for m in messages.values():
-                # logger.error(str(m['created_at']))
+                # # logger.error(str(m['created_at']))
                 created = m['created_at']
-                logger.error(f'{created.tzinfo}')
+                # logger.error(f'{created.tzinfo}')
                 mess.append({
                     # 'created_at': f'{created.hour:0>2}:{created.minute:0>2}',
                     'created_at': created.astimezone().isoformat(),
@@ -263,7 +273,7 @@ def messages_get(request, *args, **kwargs):
                     'media': m['media']
                 })
             # user_instance = User.objects.get(id=tok.user_id)
-            logger.error(tok.user)
+            # logger.error(tok.user)
             return Response(
                 data={
                     'messages': mess,
@@ -283,7 +293,7 @@ def messages_post(request, *args, **kwargs):
     Return messages or store them by Room id
     """
     try:
-        logger.error(request.headers['Authorization'])
+        # logger.error(request.headers['Authorization'])
         token = request.headers['Authorization'].split(' ')[1]
         tok = Token.objects.get(key=token)
     except Exception as e:
@@ -298,8 +308,8 @@ def messages_post(request, *args, **kwargs):
     message.room = room
     tim = datetime.now()
     final_tim = timezone.make_aware(tim, timezone=pytz.timezone('UTC'))
-    # logger.error(str(tim))
-    # logger.error(str(final_tim))
+    # # logger.error(str(tim))
+    # # logger.error(str(final_tim))
     message.created_at = final_tim
     message.save()
     return Response(data={
@@ -324,7 +334,7 @@ def messages_del(request, *args, **kwargs):
     if message_instance.user_id == user_instance.id:
         if message_instance.media:
             try:
-                os.remove(f'{os.getcwd()}/static/media/{message_instance.media_src}')
+                os.remove(f'{os.getcwd()}/mini_chat/static/media/{message_instance.media_src}')
             except Exception as e:
                 pass
         message_instance.delete()
@@ -350,7 +360,7 @@ def media_post(request):
                 'error': 'Error retrieving token'
         }, status=status.HTTP_401_UNAUTHORIZED)
     user_instance = User.objects.get(id=tok.user_id)
-    # logger.error(request.data['data'])
+    # # logger.error(request.data['data'])
     if request.data['type'] == 'message':
         message = Message()
         message.media = True
@@ -367,15 +377,15 @@ def media_post(request):
     else:
         file_name = f'{uuid.uuid4()}_profile.png'
         if user_instance.profile and user_instance.profile != '':
-            os.remove(f'{os.getcwd()}/static/media/{user_instance.profile}')
+            os.remove(f'{os.getcwd()}/mini_chat/static/media/{user_instance.profile}')
         user_instance.profile = file_name
         user_instance.save()
-    path = f'{os.getcwd()}/static/media'
+    path = f'{os.getcwd()}/mini_chat/static/media'
     with open(f'{path}/{file_name}', 'wb') as imgfile:
         b64_bytes = request.data['data'].encode('ascii')
         mess_bytes = base64.b64decode(b64_bytes)
         imgfile.write(mess_bytes)
-        logger.error(f'image saved in {path}/{file_name}')
+        # logger.error(f'image saved in {path}/{file_name}')
     return Response(data={
         'success': True
     })
@@ -393,8 +403,8 @@ def media(request, *args, **kwargs):
     #             'error': 'Error retrieving token'
     #     }, status=status.HTTP_401_UNAUTHORIZED)
     media_id = kwargs['messId']
-    logger.error(f'{os.getcwd()}/static/media/{media_id}.png')
-    img = open(f'{os.getcwd()}/static/media/{media_id}.png', 'rb')
+    # logger.error(f'{os.getcwd()}/mini_chat/static/media/{media_id}.png')
+    img = open(f'{os.getcwd()}/mini_chat/static/media/{media_id}.png', 'rb')
     return FileResponse(img)
 
 @api_view(['GET'])
@@ -419,41 +429,6 @@ def media_get(request, *args, **kwargs):
         else:
             user = User.objects.get(id=tok.user_id)
         filename = user.profile
-    logger.error(f'{os.getcwd()}/static/media/{filename}')
-    img = open(f'{os.getcwd()}/static/media/{filename}', 'rb')
+    # logger.error(f'{os.getcwd()}/mini_chat/static/media/{filename}')
+    img = open(f'{os.getcwd()}/mini_chat/static/media/{filename}', 'rb')
     return FileResponse(img)
-
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-
-class GroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-class RoomViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = Room.objects.all()
-    serializer_class = RoomSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-
-class MessageViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Message.objects.all()
-    serializer_class = MessageSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
