@@ -8,6 +8,6 @@ WORKDIR /usr/src/app
 COPY frontend /usr/src/app/frontend
 COPY frontend/entrypoint.sh /usr/src/app/entrypoint.sh
 
-RUN npm i react react-scripts -g
+# RUN npm i react react-scripts -g
 # run the entrypoint
 ENTRYPOINT [ "/usr/src/app/entrypoint.sh" ]
