@@ -318,8 +318,10 @@ export default class ChatRoom extends Component {
 		const res = await req.blob();
 		obj.object.src = window.URL.createObjectURL(res);
 		if (type === 'message') {
-			const ul = root.querySelector(`.${styles.messages}`);
-			ul.scrollTop = ul.scrollHeight;
+			setTimeout(function () {
+				const ul = root.querySelector(`.${styles.messages}`);
+				ul.scrollTop = ul.scrollHeight;
+			}, 300);
 		}
 		// console.log(res);
 	}
@@ -390,8 +392,8 @@ export default class ChatRoom extends Component {
 			}
 		}
 		setTimeout(function () {
-			const lastIndex = ul.querySelectorAll('li').length - 1;
-			const lastLi = ul.querySelectorAll('li')[lastIndex];
+			// const lastIndex = ul.querySelectorAll('li').length - 1;
+			// const lastLi = ul.querySelectorAll('li')[lastIndex];
 			ul.scrollTop = ul.scrollHeight;
 		}, 200);
 	}
