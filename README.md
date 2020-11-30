@@ -35,7 +35,7 @@ backend:
        - API_URL=http://13.59.57.0/api
 ```
 
-- REACT_APP_API_URL : at [frontend/minichat/.env](frontend/minichat/.env), affects the calls from the React Web Client to the API.
+- REACT_APP_API_URL : at [frontend/mini_chat/.env](frontend/mini_chat/.env), affects the calls from the React Web Client to the API.
 
 ```
 REACT_APP_API_URL=http://13.59.57.0/api
@@ -56,14 +56,15 @@ REACT_APP_API_URL=http://13.59.57.0/api
 
 $ sudo docker-compose up --build
 
-# If you want to use a sql dump file dump file
+# If you want to use a sql dump file
 # use the utility at the root of the project 'run_from_dump.sh'
 # grab the dump.sql file to the root of the project, and then ...
 
 $ sudo ./run_from_dump.sh
------------------------------------------------------------
--- Start creating services from dump file 'dumpfile.sql' --
------------------------------------------------------------
+
+# Warning!! This action will delete the db to restore it from the dump file
+# It's a just once action
+# You can still run the services with $ docker-compose up --build
 ```
 
 The services should be running at [localhost:3000](http://localhost:300) for the frontend service and [localhost:8000](http://localhost:8000) for the backend service.
