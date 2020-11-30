@@ -382,22 +382,23 @@ def media_post(request):
         'success': True
     })
 
-@api_view(['GET'])
-def media(request, *args, **kwargs):
-    """
-    Send the image
-    """
-    # try:
-    #     token = request.headers['Authorization'].split(' ')[1]
-    #     tok = Token.objects.get(key=token)
-    # except Exception as e:
-    #     return Response(data={
-    #             'error': 'Error retrieving token'
-    #     }, status=status.HTTP_401_UNAUTHORIZED)
-    media_id = kwargs['messId']
-    # logger.error(f'{os.getcwd()}/mini_chat/static/media/{media_id}.png')
-    img = open(f'{os.getcwd()}/mini_chat/static/media/{media_id}.png', 'rb')
-    return FileResponse(img)
+# @api_view(['GET'])
+# def media(request, *args, **kwargs):
+#     """
+#     Send the image
+#     """
+#     # try:
+#     #     token = request.headers['Authorization'].split(' ')[1]
+#     #     tok = Token.objects.get(key=token)
+#     # except Exception as e:
+#     #     return Response(data={
+#     #             'error': 'Error retrieving token'
+#     #     }, status=status.HTTP_401_UNAUTHORIZED)
+#     media_id = kwargs['messId']
+#     try:
+#         img = open(f'{os.getcwd()}/mini_chat/static/media/{media_id}.png', 'rb')
+#     except Exception as e:
+#     return FileResponse(img)
 
 @api_view(['GET'])
 def media_get(request, *args, **kwargs):
@@ -421,6 +422,12 @@ def media_get(request, *args, **kwargs):
         else:
             user = User.objects.get(id=tok.user_id)
         filename = user.profile
-    # logger.error(f'{os.getcwd()}/mini_chat/static/media/{filename}')
-    img = open(f'{os.getcwd()}/mini_chat/static/media/{filename}', 'rb')
+    try:
+        img = open(f'{os.getcwd()}/mini_chat/static/media/{filename}', 'rb')
+    except Exception as e:
+        logger.erro(f'file not found: {os.getcwd()}/mini_chat/static/media/{filename}')
+        logger.error(str(e))
+        return Response(data={
+            'success': False
+        }, status=status.HTTP_404_NOT_FOUND)
     return FileResponse(img)
