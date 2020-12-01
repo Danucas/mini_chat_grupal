@@ -13,7 +13,7 @@ services:
 #      - API_URL=http://localhost:8000/api
       - API_URL=http://13.59.57.0/api
     volumes:
-      - static:/usr/src/app/mini_chat/static
+      - static:/usr/src/app/mini_chat/root/static
   db:
     image: postgres:12-alpine
     volumes:
@@ -39,7 +39,7 @@ services:
     build: ./nginx
     restart: always
     volumes:
-      - static:/usr/src/app/mini_chat/static
+      - static:/usr/src/app/mini_chat/root/static
     ports:
       - 80:80
       - 443:443
