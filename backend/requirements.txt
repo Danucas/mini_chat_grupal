@@ -2,7 +2,9 @@ Django
 djangorestframework
 # psycopg2-binary
 django-bootstrap4
+# django-rest-swagger
 Psycopg2
 django-cors-headers
 pyyaml
 uritemplate
+drf-yasg

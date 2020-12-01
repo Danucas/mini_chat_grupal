@@ -16,25 +16,35 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from rest_framework.schemas import get_schema_view
+# from rest_framework.schemas import get_schema_view
 from rest_framework.authtoken import views as auth_views
 from api import views
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
 
 router = routers.DefaultRouter()
 # router.register(r'users', views.users)# views.UserViewSet)
 # router.register(r'groups', views.GroupViewSet)
 # router.register(r'messages', views.MessageViewSet)
 # router.register(r'rooms', views.RoomViewSet)
+schemas = get_schema_view(
+        openapi.Info(
+            title='Mini chat API docs',
+            default_version='v1',
+            description="API specs to ",
+            terms_of_service=""
+        ),
+        public=True,
+        permission_classes=(permissions.AllowAny,),
+    )
 
 urlpatterns = [
     path('api/admin/', admin.site.urls),
     path('api/api-token-auth/', views.get_token),
-    path('api/', get_schema_view(
-        title='Mini chat API Schema',
-        description='API to manager rooms messages and user authentication',
-        version='1.0.0',
-    ), name='openapi_schema'),
-    path('api/users', views.users),
+    path('api/', schemas.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    # path('api/users', views.users),
     path('api/login/', views.login, name='login'),
     path('api/register/', views.register, name='register'),
     path('api/dashboard', views.dashboard, name='dashboard'),

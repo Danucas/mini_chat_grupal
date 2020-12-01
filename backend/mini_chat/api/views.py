@@ -11,6 +11,9 @@ from rest_framework import viewsets, status
 from rest_framework import permissions
 from datetime import datetime
 from rest_framework.decorators import api_view
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.inspectors import SwaggerAutoSchema
 from rest_framework.authtoken.models import Token
 from .serializers import UserSerializer, GroupSerializer, MessageSerializer, RoomSerializer
 from rest_framework.response import Response
@@ -24,41 +27,82 @@ import uuid
 # Define a logger instance for debugging
 logger = logging.getLogger(__name__)
 
-@api_view(['GET', 'PUT'])
-def users(request):
-    """
-    Update the username linked to the token
-    """
-    try:
-        token = request.headers['Authorization'].split(' ')[1]
-        tok = Token.objects.get(key=token)
-    except Exception as e:
-        return Response(data={
-                'error': 'Error retrieving token'
-        }, status=status.HTTP_401_UNAUTHORIZED)
-    user = User.objects.get(id=tok.user_id)
-    if request.method == 'PUT':
-        if 'username' in request.data:
-            user.username = request.data['username']
-        user.save()
-        return Response(data={
-            'success': True
-        })
-    else:
-        return Response(data={
-            'fail': 'no user'
-        })
+class HtmlSchema(SwaggerAutoSchema):
+    def get_produces(self):
+        return ['text/html']
 
-@api_view(['GET', 'POST'])
+class ImageSchema(SwaggerAutoSchema):
+    def get_produces(self):
+        return ['image/png']
+
+@swagger_auto_schema(
+    auto_schema=HtmlSchema,
+    method='get',
+    responses={
+        200: openapi.Response(
+            description='Login view to access the Dashboard',
+            produces=['text/html'],
+            format='html'
+        )
+    }
+)
+@api_view(['GET'])
 def login(request):
     """
     Return the Login HTML view
     """
-    if request.method == 'GET':
-        return render(request, 'login.html', {'api_url': os.environ['API_URL']})
-    elif request.method == 'POST':
-        return Response(data=request.data)
+    return render(request, 'login.html', {'api_url': os.environ['API_URL']})
 
+@swagger_auto_schema(
+    auto_schema=HtmlSchema,
+    method='get',
+    responses={
+        200: openapi.Response(
+            description='Register HTML view',
+            produces=['text/html'],
+            format='html'
+        )
+    }
+)
+@swagger_auto_schema(
+    method='post',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'username': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='User email'
+            ),
+            'password': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='user password'
+            )
+        }
+    ),
+    responses={
+        200: openapi.Response(
+            description='Register a new user to db',
+            schema=openapi.Schema(
+                'user_info',
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'token': openapi.Schema(
+                        type=openapi.TYPE_STRING,
+                        description='registered user token'
+                    ),
+                    'username': openapi.Schema(
+                        type=openapi.TYPE_STRING,
+                        description='registered user name'
+                    ),
+                    'id': openapi.Schema(
+                        type=openapi.TYPE_STRING,
+                        description='registered user id'
+                    )
+                }
+            )
+        )
+    }
+)
 @api_view(['GET', 'POST'])
 def register(request):
     """
@@ -83,11 +127,48 @@ def register(request):
             'id': user.id,
             'username': user.username
         })
-
+@swagger_auto_schema(
+    method='post',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'username': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='User email'
+            ),
+            'password': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='user password'
+            )
+        }
+    ),
+    responses={
+        200: openapi.Response(
+            'Auth user data',
+            openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'username': openapi.Schema(
+                        type=openapi.TYPE_STRING,
+                        description='registered username'
+                    ),
+                    'id': openapi.Schema(
+                        type=openapi.TYPE_STRING,
+                        description='registered user id'
+                    ),
+                    'token': openapi.Schema(
+                        type=openapi.TYPE_STRING,
+                        description='generated token'
+                    ),
+                }
+            )
+        )
+    },
+)
 @api_view(['POST'])
 def get_token(request):
     """
-    POST: Generates a unique token and return the user info 'id', and 'username
+    Generates a unique token and return the user info 'id', and 'username
     """
     try:
         user = User.objects.get(email=request.data['username'])
@@ -117,8 +198,23 @@ def get_token(request):
         'username': user.username
     })
 
-
-@api_view(['GET', 'POST'])
+@swagger_auto_schema(
+    auto_schema=HtmlSchema,
+    method='get',
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization', in_=openapi.IN_HEADER, description='Token ', type=openapi.TYPE_STRING
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            description='Dashboard html to admin rooms',
+            produces=['text/html'],
+            format='html'
+        )
+    }
+)
+@api_view(['GET'])
 def dashboard(request):
     """
     Return the dashboard view, to control the rooms and messages
@@ -149,13 +245,83 @@ def dashboard(request):
         })
 
 
+@swagger_auto_schema(
+    method='get',
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization', in_=openapi.IN_HEADER, description='Token ', type=openapi.TYPE_STRING
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            description='Rooms list',
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'rooms': openapi.Schema(
+                        type=openapi.TYPE_ARRAY,
+                        items=openapi.Items(
+                            type=openapi.TYPE_OBJECT,
+                            properties={
+                                'name': openapi.Schema(type=openapi.TYPE_STRING),
+                                'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                            }
+                        )
+                    )
+                }
+            )
+        )
+    }
+)
+@swagger_auto_schema(
+    method='post',
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization', in_=openapi.IN_HEADER, description='Token ', type=openapi.TYPE_STRING
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            description='Rooms create one',
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'name': openapi.Schema(type=openapi.TYPE_STRING),
+                    'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                }
+            )
+        )
+    }
+)
+@swagger_auto_schema(
+    method='put',
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization', in_=openapi.IN_HEADER, description='Token ', type=openapi.TYPE_STRING
+        )
+    ],
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'name': openapi.Schema(type=openapi.TYPE_STRING)
+        }
+    ),
+    responses={
+        200: openapi.Response(
+            description='Update room name',
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'success': openapi.Schema(type=openapi.TYPE_BOOLEAN)
+                }
+            )
+        )
+    }
+)
 @api_view(['GET', 'POST', 'PUT'])
 def rooms(request):
     """
     CRUD for rooms
-    POST: creates a 'new room' instance
-    GET: Return a list of all rooms
-    PUT: Update the Room name, just for admin
     """
     try:
         token = request.headers['Authorization'].split(' ')[1]
@@ -192,6 +358,28 @@ def rooms(request):
             'success': True
         })
 
+@swagger_auto_schema(
+    method='delete',
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization', in_=openapi.IN_HEADER, description='Token ', type=openapi.TYPE_STRING
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            'Room deleted status',
+            openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'success': openapi.Schema(
+                        type=openapi.TYPE_BOOLEAN,
+                        description='delete status'
+                    )
+                }
+            )
+        )
+    }
+)
 @api_view(['DELETE'])
 def rooms_delete(request, *args, **kwargs):
     """
@@ -213,6 +401,35 @@ def rooms_delete(request, *args, **kwargs):
         'success': True
     })
 
+@swagger_auto_schema(
+    method='get',
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization', in_=openapi.IN_HEADER, description='Token ', type=openapi.TYPE_STRING
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            description='registered Users list',
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'users': openapi.Schema(
+                        type=openapi.TYPE_ARRAY,
+                        items=openapi.Items(
+                            type=openapi.TYPE_OBJECT,
+                            properties={
+                                'username': openapi.Schema(type=openapi.TYPE_STRING),
+                                'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                'last_login': openapi.Schema(type=openapi.TYPE_STRING),
+                            }
+                        )
+                    )
+                }
+            )
+        )
+    }
+)
 @api_view(['GET'])
 def rooms_users(request, *args, **kwargs):
     """
@@ -240,13 +457,44 @@ def rooms_users(request, *args, **kwargs):
     })
 
 
+@swagger_auto_schema(
+    method='get',
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization', in_=openapi.IN_HEADER, description='Token ', type=openapi.TYPE_STRING
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            description='sent messages list',
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'messages': openapi.Schema(
+                        type=openapi.TYPE_ARRAY,
+                        items=openapi.Items(
+                            type=openapi.TYPE_OBJECT,
+                            properties={
+                                'content': openapi.Schema(type=openapi.TYPE_STRING),
+                                'created_at': openapi.Schema(type=openapi.TYPE_STRING),
+                                'user': openapi.Schema(type=openapi.TYPE_STRING),
+                                'user_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                'media': openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                            }
+                        )
+                    )
+                }
+            )
+        )
+    }
+)
 @api_view(['GET'])
 def messages_get(request, *args, **kwargs):
     """
     Return messages filtered by room
     """
     try:
-        # logger.error(request.headers['Authorization'])
         token = request.headers['Authorization'].split(' ')[1]
         tok = Token.objects.get(key=token)
     except Exception as e:
@@ -281,6 +529,38 @@ def messages_get(request, *args, **kwargs):
                 'error': 'not found'
             }, status=status.HTTP_404_NOT_FOUND)
 
+
+@swagger_auto_schema(
+    method='post',
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization', in_=openapi.IN_HEADER, description='Token ', type=openapi.TYPE_STRING
+        )
+    ],
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'content': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='client message content'
+            )
+        }
+    ),
+    responses={
+        200: openapi.Response(
+            'Message sent status',
+            openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'success': openapi.Schema(
+                        type=openapi.TYPE_BOOLEAN,
+                        description='sent state'
+                    )
+                }
+            )
+        )
+    }
+)
 @api_view(['POST'])
 def messages_post(request, *args, **kwargs):
     """
@@ -308,6 +588,28 @@ def messages_post(request, *args, **kwargs):
         'id': message.id
     })
 
+@swagger_auto_schema(
+    method='delete',
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization', in_=openapi.IN_HEADER, description='Token ', type=openapi.TYPE_STRING
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            'Message deleted status',
+            openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'success': openapi.Schema(
+                        type=openapi.TYPE_BOOLEAN,
+                        description='delete status'
+                    )
+                }
+            )
+        )
+    }
+)
 @api_view(['DELETE'])
 def messages_del(request, *args, **kwargs):
     """
@@ -338,11 +640,45 @@ def messages_del(request, *args, **kwargs):
             'success': False
         }, status=status.HTTP_401_UNAUTHORIZED)
 
-
+@swagger_auto_schema(
+    method='post',
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization', in_=openapi.IN_HEADER, description='Token ', type=openapi.TYPE_STRING
+        )
+    ],
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'data': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='base64 String'
+            ),
+            'type': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='to manage storage paths, options: profile, message'
+            )
+        }
+    ),
+    responses={
+        200: openapi.Response(
+            'Media upload status',
+            openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'success': openapi.Schema(
+                        type=openapi.TYPE_BOOLEAN,
+                        description='upload state'
+                    )
+                }
+            )
+        )
+    }
+)
 @api_view(['POST'])
 def media_post(request):
     """
-    Store and image as b64 string
+    POST: Receives a b64 string and decode it to bytes into a file to static folder
     """
     try:
         token = request.headers['Authorization'].split(' ')[1]
@@ -352,7 +688,6 @@ def media_post(request):
                 'error': 'Error retrieving token'
         }, status=status.HTTP_401_UNAUTHORIZED)
     user_instance = User.objects.get(id=tok.user_id)
-    # # logger.error(request.data['data'])
     if request.data['type'] == 'message':
         message = Message()
         message.media = True
@@ -382,24 +717,24 @@ def media_post(request):
         'success': True
     })
 
-# @api_view(['GET'])
-# def media(request, *args, **kwargs):
-#     """
-#     Send the image
-#     """
-#     # try:
-#     #     token = request.headers['Authorization'].split(' ')[1]
-#     #     tok = Token.objects.get(key=token)
-#     # except Exception as e:
-#     #     return Response(data={
-#     #             'error': 'Error retrieving token'
-#     #     }, status=status.HTTP_401_UNAUTHORIZED)
-#     media_id = kwargs['messId']
-#     try:
-#         img = open(f'{os.getcwd()}/mini_chat/static/media/{media_id}.png', 'rb')
-#     except Exception as e:
-#     return FileResponse(img)
 
+@swagger_auto_schema(
+    auto_schema=ImageSchema,
+    method='get',
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization', in_=openapi.IN_HEADER, description='Token ', type=openapi.TYPE_STRING
+        ),
+        openapi.Parameter(
+            'type', in_=openapi.IN_QUERY, description='type of media to get, profile or message', type=openapi.TYPE_STRING
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            'Media upload status'
+        )
+    }
+)
 @api_view(['GET'])
 def media_get(request, *args, **kwargs):
     """
