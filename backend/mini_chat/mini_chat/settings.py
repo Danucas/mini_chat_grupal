@@ -133,11 +133,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+STATIC_ROOT = '/usr/src/app/mini_chat/static/'
+
 STATIC_URL = '/api/static/'
 
 STATICFILES_DIRS = [
-    "static",
-    '/usr/src/app/mini_chat/static/',
+    "static"
 ]
 
 
