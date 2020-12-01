@@ -138,7 +138,7 @@ STATIC_ROOT = '/usr/src/app/mini_chat/static/'
 STATIC_URL = '/api/static/'
 
 STATICFILES_DIRS = [
-    "static"
+    "mini_chat/static"
 ]
 
 
