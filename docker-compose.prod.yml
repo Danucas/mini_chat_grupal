@@ -23,6 +23,8 @@ services:
       - POSTGRES_PASSWORD=mini_chat_passwd
       - POSTGRES_DB=mini_chat_dev_db
       - TZ=America/Bogota
+    ports:
+      - 5432:5432
   frontend:
     build:
       context: .
