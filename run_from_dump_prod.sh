@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-docker-compose up --build -d db
+docker-compose -f docker-compose.prod.yml up --build -d db
 sleep 5
 while ! nc -z -v -w5 0.0.0.0 5432; do
     sleep 3
